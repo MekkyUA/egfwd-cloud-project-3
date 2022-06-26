@@ -23,6 +23,17 @@ commands:
           unzip awscliv2.zip
           sudo ./aws/install
 
+  install-node13:
+    description: Install nodejs v13.x for Linux-based images.
+    steps:
+      - run:
+        name: Install nodejs v13.
+        command: |
+          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+          sudo apt install nodejs -y
+          sudo npm install n -g
+          sudo n 13.8.0
+
   destroy-environment-on-failure:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
@@ -230,43 +241,55 @@ jobs:
       - destroy-environment-on-failure
       - revert-migrations-on-failure
 
-#   deploy-frontend:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#             export API_URL="http://${BACKEND_IP}:3030"
-#             echo "${API_URL}"
-#       - run:
-#           name: Deploy frontend objects
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure      
-                    
-#   deploy-backend:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Deploy backend
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  deploy-frontend:
+    executor: node
+    steps:
+      - checkout
+      - install-awscli
+      - run:
+          name: Get backend url
+          command: |
+            BACKEND_BASE_URL=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicDnsName' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text)
+            export API_URL="http://${BACKEND_BASE_URL}:3030"
+            echo "${API_URL}"
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm run build
+            aws s3 sync dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment-on-failure
+      - revert-migrations-on-failure
+
+  deploy-backend:
+    executor: python
+    steps:
+      - checkout
+      - install-node13
+      - add_ssh_keys:
+          fingerprints: ["08:57:0b:f8:0f:92:03:fd:55:b2:31:52:1c:7f:81:9b"]
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys: [backend-build-deps]
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m pip install --upgrade --user pip
+            python3 -m pip install --upgrade --user awscli
+            python3 -m pip install --upgrade --user ansible
+            ansible --version
+      - run:
+          name: Deploy backend
+          working_directory: ./.circleci/ansible
+          command: |
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment-on-failure
+      - revert-migrations-on-failure
 
 #   smoke-test:
 #     docker:
@@ -348,10 +371,10 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:

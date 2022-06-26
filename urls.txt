@@ -1,2 +1,5 @@
-[URL01] (Public Url to GitHub repository)
+[URL01] (Public URL to GitHub repository)
 https://github.com/MekkyUA/egfwd-cloud-project-3
+
+[URL02] (Public URL to the S3 bucket)
+http://udapeople-745d716.s3-website-us-east-1.amazonaws.com

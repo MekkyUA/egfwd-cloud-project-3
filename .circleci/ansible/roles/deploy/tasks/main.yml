@@ -1,0 +1,33 @@
+---
+- name: "override environment variables."
+  become: true
+  shell: env
+  enviroment:
+    - TYPEORM_MIGRATIONS_DIR: "./migrations"
+    - TYPEORM_MIGRATIONS: "./migrations/*.js"
+    - TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
+
+- name: "sync backend dependencies."
+  become: true
+  synchronize:
+    src: ~/project/backend/node_modules
+    dest: ~/app
+    recursive: true
+
+- name: "sync backend binaries."
+  become: true
+  synchronize:
+    src: ~/project/backend/dist
+    dest: ~/app
+    recursive: true
+
+- name: "kill any pm2 running app."
+  become: true
+  command: pm2 delete all
+  ignore_errors: true
+
+- name: "launch the backend app using pm2."
+  become: true
+  command: pm2 start main.js
+  args:
+    chdir: ~/app/dist
