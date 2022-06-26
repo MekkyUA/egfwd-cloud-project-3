@@ -4,6 +4,12 @@
   shell: |
     curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 
+- name: "install nodejs and npm (node package manager)."
+  become: true
+  apt:
+    name: ["nodejs", "npm"]
+    state: latest
+
 - name: "install n (node version manager)."
   become: true
   npm:
