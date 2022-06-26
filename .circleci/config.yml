@@ -17,22 +17,22 @@ commands:
     description: Install AWS-CLIv2 for Linux-based images.
     steps:
       - run:
-        name: Install AWSCLIv2.
-        command: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
+          name: Install AWSCLIv2.
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
 
   install-node13:
     description: Install nodejs v13.x for Linux-based images.
     steps:
       - run:
-        name: Install nodejs v13.
-        command: |
-          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-          sudo apt install nodejs -y
-          sudo npm install n -g
-          sudo n 13.8.0
+          name: Install nodejs v13.
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            sudo apt install nodejs -y
+            sudo npm install n -g
+            sudo n 13.8.0
 
   destroy-environment-on-failure:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
