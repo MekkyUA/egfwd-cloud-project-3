@@ -13,7 +13,17 @@ executors:
       - image: cimg/python:3.10.4
 
 commands:
-  destroy_environment_on_failure:
+  install-awscli:
+    description: Install AWS-CLIv2 for Linux-based images.
+    steps:
+      - run:
+        name: Install AWSCLIv2.
+        command: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+  destroy-environment-on-failure:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       WorkflowID:
@@ -29,25 +39,28 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.WorkflowID >>
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.WorkflowID >>
 
-#   revert-migrations:
-#     description: Revert the last migration if successfully run in the current workflow.
-#     parameters:
-#       # Add parameter here     
-#     steps:
-#       - run:
-#           name: Revert migrations
-#           # Add when this will run
-#           command: |
-#             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-#             SUCCESS = 1
-#             if(( $SUCCESS==1 )); 
-#             then
-#             #  cd ~/project/backend
-#             #  npm install
-#             #  Add revert code here. You can find this in the Getting Started section.
-#               exit 1
-#             fi
-            
+  revert-migrations-on-failure:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      WorkflowID:
+        description: The workflow ID to destroy.
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}    
+    steps:
+      - checkout
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            MIG_RES_URL=https://kvdb.io/6mgeCfv5dvJv4sL1kciad3/migration_<< parameters.WorkflowID >>
+            SUCCESS=$(curl --insecure ${MIG_RES_URL})
+            if (( $SUCCESS == 1 ));
+            then
+              cd backend
+              npm i
+              npm run migration:revert
+            fi
+
 jobs:
   build-frontend:
     executor: node
@@ -165,8 +178,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy_environment_on_failure:
-          WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}      
+      - destroy-environment-on-failure  
 
   configure-infrastructure:
     executor: python
@@ -189,25 +201,34 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy_environment_on_failure:
-          WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7} 
+      - destroy-environment-on-failure
 
-#   run-migrations:
-#     docker:
-#       # Docker image here that supports NodeJS
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Run migrations
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Send migration results to memstash
-#           command: |
-#             # Your code here
-#             exit 1
-#      # Here's where you will add some code to rollback on failure      
+  run-migrations:
+    executor: node
+    steps:
+      - checkout
+      - install-awscli
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm i
+            npm run migrations > migrations.log
+      - run:
+          name: Send migration results to kvdb.io
+          command: |
+            URL=https://kvdb.io/6mgeCfv5dvJv4sL1kciad3/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            cat backend/migrations.log
+            if grep -q "has been executed successfully." backend/migrations.log
+            then
+              echo "migrations executed successfully, sending (1) to ${URL}"
+              curl ${URL} -d '1'
+            else
+              echo "migrations failed, sending (0) to ${URL}"
+              curl ${URL} -d '0'
+            fi
+      - destroy-environment-on-failure
+      - revert-migrations-on-failure
 
 #   deploy-frontend:
 #     docker:
@@ -325,8 +346,8 @@ workflows:
               only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
       # - deploy-frontend:
       #     requires: [run-migrations]
       # - deploy-backend:
