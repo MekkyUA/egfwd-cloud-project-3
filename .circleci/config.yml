@@ -13,7 +13,7 @@ executors:
       - image: cimg/python:3.10.4
 
 commands:
-  destroy-environment_on_failure:
+  destroy_environment_on_failure:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       WorkflowID:
@@ -165,7 +165,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment_on_failure:
+      - destroy_environment_on_failure:
           WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}      
 
   configure-infrastructure:
