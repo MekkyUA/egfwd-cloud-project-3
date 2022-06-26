@@ -179,12 +179,14 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            python3 -m pip install --upgrade --user pip
+            python3 -m pip install --upgrade --user awscli
             python3 -m pip install --upgrade --user ansible
             ansible --version
       - run:
           name: Configure server
           command: |
-            cd ./circleci/ansible
+            cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
       - destroy_environment_on_failure:
