@@ -1,6 +1,12 @@
 ---
 - name: "print current env vars"
-  shell: env
+  shell: printenv
+
+- name: "install rsync on the ansible controller."
+  connection: local
+  package:
+    name: rsync
+    state: present
 
 - name: "sync backend dependencies."
   become: true
