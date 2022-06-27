@@ -83,6 +83,7 @@ jobs:
           name: Front-end build 
           command: |
             cd frontend
+            npm audit fix --audit-level=critical --force
             npm i
             npm run build
       - save_cache:
@@ -99,6 +100,7 @@ jobs:
           name: Back-end build
           command: |
             cd backend
+            npm audit fix --audit-level=critical --force
             npm i
             npm run build
       - save_cache:
@@ -142,7 +144,7 @@ jobs:
           command: |
             cd frontend
             npm i
-            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
 
   scan-backend:
     executor: node
@@ -155,7 +157,7 @@ jobs:
           command: |
             cd backend
             npm i
-            npm audit fix --audit-level=critical --force
+            npm audit--audit-level=critical
 
   deploy-infrastructure:
     executor: aws
@@ -219,6 +221,8 @@ jobs:
     steps:
       - checkout
       - install-awscli
+      - restore_cache:
+          keys: [backend-build-deps]
       - run:
           name: Run migrations
           command: |
@@ -246,6 +250,8 @@ jobs:
     steps:
       - checkout
       - install-awscli
+      - restore_cache:
+          keys: [frontend-build-deps]
       - run:
           name: Get backend url
           command: |
@@ -259,7 +265,6 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
-            npm run build
             aws s3 sync dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-environment-on-failure
       - revert-migrations-on-failure
