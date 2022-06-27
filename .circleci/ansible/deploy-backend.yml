@@ -13,7 +13,7 @@
     - ansible_stdout_callback: yaml
 
   # override CircleCI environment variables
-  enviroment:
+  environment:
     - TYPEORM_MIGRATIONS_DIR: "./migrations"
     - TYPEORM_MIGRATIONS: "./migrations/*.js"
     - TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
