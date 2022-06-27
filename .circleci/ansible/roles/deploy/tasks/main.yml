@@ -13,14 +13,14 @@
   become: true
   synchronize:
     src: ~/project/backend/node_modules
-    dest: ~/app
+    dest: /home/ubuntu/app
     recursive: true
 
 - name: "sync backend binaries."
   become: true
   synchronize:
     src: ~/project/backend/dist
-    dest: ~/app
+    dest: /home/ubuntu/app
     recursive: true
 
 - name: "kill any pm2 running app."
@@ -32,4 +32,4 @@
   become: true
   command: pm2 start main.js
   args:
-    chdir: ~/app/dist
+    chdir: /home/ubuntu/app/dist
