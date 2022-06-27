@@ -33,3 +33,5 @@
   command: pm2 start main.js
   args:
     chdir: /home/ubuntu/app/dist
+  environment:
+    NODE_ENV: production
