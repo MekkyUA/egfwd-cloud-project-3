@@ -2,11 +2,13 @@
 
 - name: "override environment variables."
   become: true
-  shell: env
   enviroment:
     - TYPEORM_MIGRATIONS_DIR: "./migrations"
     - TYPEORM_MIGRATIONS: "./migrations/*.js"
     - TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
+
+- name: "print current env vars"
+  shell: env
 
 - name: "sync backend dependencies."
   become: true
