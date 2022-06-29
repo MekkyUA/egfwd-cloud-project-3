@@ -22,8 +22,8 @@
     - TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD')}}"
     - TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE')}}"
     - TYPEORM_MIGRATIONS_DIR: "./migrations"
-    - TYPEORM_MIGRATIONS: "./migrations/*.js"
-    - TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
+    - TYPEORM_MIGRATIONS: "./migrations/*.ts"
+    - TYPEORM_ENTITIES: "./modules/domain/**/*.entity.{ts,js}"
   
   roles:
     - deploy
