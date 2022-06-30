@@ -368,6 +368,7 @@ jobs:
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
               --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
             echo "STACKS => ${STACKS[@]}"
+            echo "OLD_WORKFLOW_ID => $OLD_WORKFLOW_ID"
 
             # ensure that all variables are set
             if [[ -z "${STACKS[*]}" ]] || [[ -z "${OLD_WORKFLOW_ID}" ]]
