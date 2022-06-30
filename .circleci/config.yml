@@ -251,17 +251,14 @@ jobs:
       - restore_cache:
           keys: [frontend-build-deps]
       - run:
-          name: Get backend url
+          name: Deploy frontend objects
           command: |
             BACKEND_BASE_URL=$(aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicDnsName' \
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text)
             export API_URL="http://${BACKEND_BASE_URL}:3030"
-            echo "${API_URL}"
-      - run:
-          name: Deploy frontend objects
-          command: |
+            echo "API_URL => ${API_URL}"
             cd frontend
             npm run build
             aws s3 sync dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}
