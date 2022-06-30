@@ -56,7 +56,7 @@ commands:
       WorkflowID:
         description: The workflow ID to destroy.
         type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:7}    
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - checkout
       - run:
@@ -80,7 +80,7 @@ jobs:
       - restore_cache:
           keys: [frontend-build-deps]
       - run:
-          name: Front-end build 
+          name: Front-end build
           command: |
             cd frontend
             npm i
@@ -117,7 +117,7 @@ jobs:
             cd frontend
             npm i
             npm test
-                
+
   test-backend:
     executor: node
     steps:
@@ -130,7 +130,7 @@ jobs:
             cd backend
             npm i
             npm test
-            
+
   scan-frontend:
     executor: node
     steps:
@@ -168,7 +168,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -176,7 +176,7 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --tags project=udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -189,7 +189,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment-on-failure  
+      - destroy-environment-on-failure
 
   configure-infrastructure:
     executor: python
@@ -321,7 +321,7 @@ jobs:
             FE_URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com"
             curl -s $FE_URL | grep -q "Welcome"
       - destroy-environment-on-failure
-      - revert-migrations-on-failure 
+      - revert-migrations-on-failure
 
   cloudfront-update:
     executor: aws
@@ -349,8 +349,8 @@ jobs:
       - destroy-environment-on-failure
       - revert-migrations-on-failure
 
-cleanup:
-  executor: aws
+  cleanup:
+    executor: aws
     steps:
       - checkout
       - attach_workspace:
