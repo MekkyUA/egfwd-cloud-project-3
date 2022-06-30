@@ -335,7 +335,7 @@ jobs:
               --no-paginate --output text)
 
             echo "OLD_WORKFLOW_ID => $OLD_WORKFLOW_ID"
-            echo $Old_WORKFLOW_ID > .circleci/files/old_workflow_id.txt
+            echo $OLD_WORKFLOW_ID > .circleci/files/old_workflow_id.txt
 
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
