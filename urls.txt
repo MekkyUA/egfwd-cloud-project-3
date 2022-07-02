@@ -2,4 +2,12 @@
 https://github.com/MekkyUA/egfwd-cloud-project-3
 
 [URL02] (Public URL to the S3 bucket)
-http://udapeople-745d716.s3-website-us-east-1.amazonaws.com
+http://udapeople-0c8918d.s3-website-us-east-1.amazonaws.com
+
+[URL03] (Public URL for CloudFront distribution)
+http://dovi2zg02zgu2.cloudfront.net
+
+[URL04] (Public URL for the back-end server in EC2)
+http://ec2-3-87-78-100.compute-1.amazonaws.com:3030/api/status
+
+[URL05] (Public URL to the Prometheus Server)

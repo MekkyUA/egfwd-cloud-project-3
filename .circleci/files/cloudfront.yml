@@ -35,6 +35,11 @@ Resources:
 Outputs:
   WorkflowID:
     Value: !Sub ${WorkflowID}
-    Description: URL for website hosted on S3
+    Description: Cloudfront distribution WorkflowID.
     Export:
       Name: WorkflowID
+  CloudFrontEndpoint:
+    Description: Cloudfront distribution endpoint.
+    Value: !Ref "WebpageCDN"
+    Export:
+      Name: WebsiteURL
