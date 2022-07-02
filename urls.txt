@@ -2,12 +2,15 @@
 https://github.com/MekkyUA/egfwd-cloud-project-3
 
 [URL02] (Public URL to the S3 bucket)
-http://udapeople-0c8918d.s3-website-us-east-1.amazonaws.com
+http://udapeople-b124a67.s3-website-us-east-1.amazonaws.com
 
 [URL03] (Public URL for CloudFront distribution)
 http://dovi2zg02zgu2.cloudfront.net
 
 [URL04] (Public URL for the back-end server in EC2)
-http://ec2-3-87-78-100.compute-1.amazonaws.com:3030/api/status
+http://ec2-174-129-79-18.compute-1.amazonaws.com:3030/api/status
 
 [URL05] (Public URL to the Prometheus Server)
+http://ec2-3-84-26-158.compute-1.amazonaws.com:9090 => Prometheus
+http://ec2-3-84-26-158.compute-1.amazonaws.com:3000 => Graphana (username: admin, pass: foobar)
+http://ec2-3-84-26-158.compute-1.amazonaws.com:9093 => Alert Manager
