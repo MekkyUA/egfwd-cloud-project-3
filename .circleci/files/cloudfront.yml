@@ -40,6 +40,6 @@ Outputs:
       Name: WorkflowID
   CloudFrontEndpoint:
     Description: Cloudfront distribution endpoint.
-    Value: !Ref "WebpageCDN"
+    Value: !GetAtt WebpageCDN.DomainName
     Export:
       Name: WebsiteURL
